@@ -1,3 +1,19 @@
+System Operation Guide
+Prepared by: Mr. Demetrial
+
+1. Adding Products
+Navigate to the Product Entry section on the main dashboard. Enter the item name, initial stock count, and price. Submit the form to save the item to the database. It will immediately appear on the inventory list.
+
+2. Updating Current Stock
+If there are new deliveries from suppliers, locate the item on the main table. Go to the Tracking column, input the new total stock count, and press the Update Total button to refresh the database records.
+
+3. Deducting Sales
+To record a transaction, find the specific item on the list. Under the Sales column, type the exact number of items sold to the customer. Click Deduct Sale. The system will automatically subtract this from your current stock.
+
+4. Monitoring Inventory Levels
+Always check the status color of the items. The system is programmed to change the stock indicator to red if the quantity drops to 10 or below. This serves as a warning to restock the item to avoid zero inventory.
+
+
 # Getting Started
 
 ### Reference Documentation
