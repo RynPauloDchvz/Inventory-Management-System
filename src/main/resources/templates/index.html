@@ -2,113 +2,512 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Inventory Management System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Inventory Management System | Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* Pantay-pantay na width para sa labels para naka-align ang mga inputs */
-        .module-label {
-            width: 75px;
-            font-size: 0.7rem;
-            font-weight: bold;
+        :root {
+            --bg-color: #f0f2f5;
+            --sidebar-bg: #1a233a;
+            --sidebar-text: #aeb7c2;
+            --primary-accent: #00e676;
+            --card-bg: #ffffff;
+            --text-dark: #2d3436;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+
+        .app-wrapper { display: flex; min-height: 100vh; }
+
+        .sidebar {
+            width: 280px;
+            background-color: var(--sidebar-bg);
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+        }
+
+        .brand-logo {
+            color: #ffffff;
+            font-size: 1.25rem;
+            font-weight: 800;
+            text-decoration: none;
+            margin-bottom: 3rem;
+            display: block;
+            letter-spacing: -0.5px;
+            line-height: 1.4;
+        }
+
+        .sidebar-label {
+            color: var(--sidebar-text);
+            font-size: 0.75rem;
             text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            opacity: 0.8;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .content-container {
+            padding: 2rem 3rem;
+            flex: 1;
+        }
+
+        .form-control-modern {
+            background-color: #f9f9f9;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .form-control-modern:focus {
+            background-color: #fff;
+            border-color: var(--primary-accent);
+            box-shadow: 0 0 0 4px rgba(0, 230, 118, 0.15);
+        }
+
+        .btn-modern-primary {
+            background-color: var(--primary-accent);
+            color: #1a233a;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+            transition: all 0.2s;
+            width: 100%;
+        }
+        .btn-modern-primary:hover {
+            background-color: #00c853;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 230, 118, 0.3);
+        }
+
+        .content-card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            border: none;
+        }
+
+        .card-header-modern {
+            padding: 1.5rem 2rem;
+            background: none;
+            border-bottom: 1px solid #eee;
+        }
+
+        .table-modern th {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: #888;
+            letter-spacing: 1px;
+            padding: 1rem 1.5rem;
+            border-bottom: 2px solid #eee;
+        }
+
+        .table-modern td {
+            padding: 1rem 1.5rem;
+            font-size: 0.95rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .product-name-cell { font-weight: 600; color: var(--text-dark); }
+        .stock-cell { font-weight: 800; font-size: 1.1rem; }
+
+        .status-pill {
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .status-safe { background-color: rgba(0, 230, 118, 0.15); color: #00c853; }
+        .status-low { background-color: rgba(255, 152, 0, 0.15); color: #f57c00; font-weight: 800; }
+        .status-out { background-color: rgba(220, 53, 69, 0.15); color: #dc3545; font-weight: 800; }
+
+        .btn-action-modern {
+            font-weight: 700;
+            font-size: 0.8rem;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            text-transform: uppercase;
+        }
+
+        .btn-action-modern:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .modal-content-modern {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        .modal-header-modern { border: none; padding: 1.5rem 2rem 0.5rem 2rem; }
+        .modal-body-modern { padding: 1rem 2rem 2rem 2rem; }
+        .modal-footer-modern { border: none; background-color: #f9f9f9; border-radius: 0 0 16px 16px; padding: 1rem 2rem; }
+
+        .footer-modern {
+            background-color: #ffffff;
+            padding: 1.5rem 2rem;
+            border-top: 1px solid #e0e0e0;
             color: #6c757d;
-            display: inline-block;
-        }
-        /* Fixed width para sa mga buttons para magkakasing-haba sila */
-        .btn-action {
-            width: 110px;
-        }
-        /* Fixed width para sa input boxes */
-        .input-qty {
-            width: 80px !important;
+            font-size: 0.85rem;
+            text-align: center;
+            margin-top: auto;
         }
     </style>
 </head>
-<body class="bg-light">
+<body>
 
-<div class="container mt-5">
-    <h2 class="text-center mb-4">Inventory Management System</h2>
+<div class="app-wrapper">
+    <nav class="sidebar">
+        <div class="brand-logo">Inventory Management System</div>
 
-    <div class="row">
-        <div class="col-md-3">
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Product Entry</h5>
+        <div class="sidebar-label">Core Modules</div>
+
+        <div class="card bg-transparent border-0 text-white mb-4">
+            <div class="fw-bold mb-3" style="color: #fff; font-size: 1.1rem;">Add Product</div>
+            <form th:action="@{/saveProduct}" th:object="${newProduct}" method="POST">
+                <div class="mb-3">
+                    <input type="text" th:field="*{name}" class="form-control form-control-modern bg-white" required placeholder="Item Name">
                 </div>
-                <div class="card-body">
-                    <form th:action="@{/saveProduct}" th:object="${newProduct}" method="POST">
-                        <div class="mb-3">
-                            <label class="form-label">Name</label>
-                            <input type="text" th:field="*{name}" class="form-control" required placeholder="Item name">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Initial Stock</label>
-                            <input type="number" th:field="*{stockQuantity}" class="form-control" required min="0">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Price</label>
-                            <input type="number" step="0.01" th:field="*{price}" class="form-control" required min="0">
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100">Add Product</button>
-                    </form>
+                <div class="mb-3">
+                    <input type="number" th:field="*{stockQuantity}" class="form-control form-control-modern bg-white" required min="0" placeholder="Initial Stock">
                 </div>
-            </div>
+                <div class="mb-3">
+                    <input type="number" step="0.01" th:field="*{price}" class="form-control form-control-modern bg-white" required min="0" placeholder="Price (PHP)">
+                </div>
+                <button type="submit" class="btn-modern-primary">Save to Database</button>
+            </form>
         </div>
+    </nav>
 
-        <div class="col-md-9">
-            <div class="card shadow-sm">
-                <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0">Inventory & Sales Report</h5>
+    <main class="main-content">
+        <div class="content-container">
+            <div class="card content-card shadow">
+                <div class="card-header-modern d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0 fw-bold">Real-Time Report Module</h4>
+                    <div class="text-muted small">Live Database Connection</div>
                 </div>
-                <div class="card-body">
+
+                <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle">
+                        <table class="table table-hover align-middle table-modern mb-0">
                             <thead class="table-light">
                             <tr>
-                                <th style="width: 50px;">ID</th>
-                                <th>Product Name</th>
-                                <th style="width: 120px;">Current Stock</th>
-                                <th style="width: 120px;">Price</th>
-                                <th style="width: 320px;" class="text-center">Actions</th>
+                                <th>ID</th>
+                                <th>Product Details</th>
+                                <th>Unit Price</th>
+                                <th class="text-center">Available Stock</th>
+                                <th class="text-center">Status Alert</th>
+                                <th class="text-center">Action Modules</th>
                             </tr>
                             </thead>
                             <tbody>
                             <tr th:each="product : ${listProducts}">
-                                <td th:text="${product.id}"></td>
-                                <td th:text="${product.name}" class="fw-bold"></td>
-                                <td>
-                                    <span th:text="${product.stockQuantity}"
-                                          th:classappend="${product.stockQuantity <= 10} ? 'badge bg-danger' : 'badge bg-success'">
-                                    </span>
-                                </td>
-                                <td th:text="'₱' + ${product.price}"></td>
-                                <td>
-                                    <div class="d-flex flex-column gap-2 border-start ps-3">
-                                        <form th:action="@{/updateStock}" method="POST" class="d-flex align-items-center justify-content-between">
-                                            <span class="module-label">Tracking</span>
-                                            <input type="hidden" name="productId" th:value="${product.id}">
-                                            <input type="number" name="newQuantity" th:value="${product.stockQuantity}" class="form-control form-control-sm input-qty mx-2">
-                                            <button type="submit" class="btn btn-sm btn-info text-white btn-action">Update Total</button>
-                                        </form>
+                                <td class="text-muted" th:text="${product.id}"></td>
+                                <td class="product-name-cell fs-6" th:text="${product.name}"></td>
+                                <td th:text="'PHP ' + ${product.price}"></td>
 
-                                        <form th:action="@{/sellProduct}" method="POST" class="d-flex align-items-center justify-content-between">
-                                            <span class="module-label">Sales</span>
-                                            <input type="hidden" name="productId" th:value="${product.id}">
-                                            <input type="number" name="quantity" value="1" min="1" class="form-control form-control-sm input-qty mx-2">
-                                            <button type="submit" class="btn btn-sm btn-danger btn-action">Deduct Sale</button>
-                                        </form>
+                                <td class="text-center stock-cell text-primary" th:text="${product.stockQuantity}"></td>
+
+                                <td class="text-center status-pills-container">
+                                    <span th:if="${product.stockQuantity > 9}" class="status-pill status-safe">In Stock</span>
+                                    <span th:if="${product.stockQuantity <= 9 and product.stockQuantity > 0}" class="status-pill status-low">Low Stock Alert</span>
+                                    <span th:if="${product.stockQuantity <= 0}" class="status-pill status-out">Out of Stock</span>
+                                </td>
+
+                                <td class="text-center pe-4">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <button type="button" class="btn btn-sm btn-outline-info btn-action-modern" data-bs-toggle="modal" th:data-bs-target="'#updateModal' + ${product.id}">
+                                            Tracking
+                                        </button>
+
+                                        <button type="button" class="btn btn-sm btn-danger btn-action-modern shadow-sm" data-bs-toggle="modal" th:data-bs-target="'#sellModal' + ${product.id}" th:disabled="${product.stockQuantity <= 0}">
+                                            Sales
+                                        </button>
                                     </div>
                                 </td>
+
+                                <div class="modal fade" th:id="'updateModal' + ${product.id}" tabindex="-1">
+                                    <div class="modal-dialog modal-dialog-centered modal-sm">
+                                        <div class="modal-content modal-content-modern">
+                                            <form th:action="@{/updateStock}" method="POST" onsubmit="return handleUpdateLogic()">
+                                                <div class="modal-header modal-header-modern bg-info text-white py-3">
+                                                    <h6 class="modal-title fw-bold text-center w-100">Add Supply: <span th:text="${product.name}"></span></h6>
+                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <div class="modal-body modal-body-modern text-center py-4">
+                                                    <h5 class="text-muted mb-1">Current Stock: <span class="text-info fw-bold" th:text="${product.stockQuantity}"></span></h5>
+                                                    <p class="small text-muted mb-4">How much new supply arrived?</p>
+
+                                                    <input type="hidden" name="productId" th:value="${product.id}">
+                                                    <input type="hidden" name="newQuantity" th:id="'hiddenNewQty_' + ${product.id}" th:value="${product.stockQuantity}">
+
+                                                    <input type="number" th:oninput="'updateHiddenTotal(this.value, ' + ${product.stockQuantity} + ', \'hiddenNewQty_' + ${product.id} + '\')'" class="form-control form-control-modern form-control-lg text-center mx-auto" style="max-width: 150px;" required min="1" placeholder="Qty">
+                                                </div>
+                                                <div class="modal-footer modal-footer-modern bg-light d-flex justify-content-center">
+                                                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                    <button type="submit" class="btn btn-sm btn-info text-white fw-bold btn-action-modern">Add to Total</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="modal fade" th:id="'sellModal' + ${product.id}" tabindex="-1">
+                                    <div class="modal-dialog modal-dialog-centered modal-sm">
+                                        <div class="modal-content modal-content-modern border-danger">
+                                            <form th:action="@{/sellProduct}" method="POST" th:onsubmit="'return handleSalesLogic(event, this, ' + ${product.stockQuantity} + ')'">
+                                                <div class="modal-header modal-header-modern bg-danger text-white py-3">
+                                                    <h6 class="modal-title fw-bold text-center w-100">Deduct Sales: <span th:text="${product.name}"></span></h6>
+                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <div class="modal-body modal-body-modern text-center py-4">
+                                                    <h3 class="text-muted mb-1">Available: <span class="text-primary fw-bold" th:text="${product.stockQuantity}"></span></h3>
+                                                    <p class="small text-muted mb-4">Quantity being sold?</p>
+                                                    <input type="hidden" name="productId" th:value="${product.id}">
+                                                    <input type="number" name="quantity" value="1" min="1" class="form-control form-control-modern form-control-lg text-center mx-auto" style="max-width: 150px;" required>
+                                                </div>
+                                                <div class="modal-footer modal-footer-modern bg-light d-flex justify-content-center">
+                                                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                    <button type="submit" class="btn btn-sm btn-danger fw-bold btn-action-modern">Process Sale</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
                             </tr>
                             </tbody>
                         </table>
                     </div>
-                    <p th:if="${#lists.isEmpty(listProducts)}" class="text-center text-muted mt-3">No products found in the database.</p>
+                    <div th:if="${#lists.isEmpty(listProducts)}" class="text-center text-muted py-5 px-4 content-card mx-auto mt-4" style="max-width: 400px;">
+                        <h6>No products found in the database. Use the Add Product module to begin.</h6>
+                    </div>
                 </div>
+            </div>
+        </div>
+
+        <footer class="footer-modern mt-auto">
+            <h6 class="mb-1 fw-bold">2026 Inventory Management System</h6>
+            <p class="small mb-0">Project Developed by: Cordova, De Chavez, Demetrial, Padayao, Paulino</p>
+        </footer>
+    </main>
+</div>
+
+<div class="modal fade" id="restockSuccessModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content modal-content-modern border-info">
+            <div class="modal-header modal-header-modern bg-info text-white py-3">
+                <h6 class="modal-title fw-bold text-center w-100">Update Successful</h6>
+            </div>
+            <div class="modal-body modal-body-modern text-center py-4">
+                <h5 class="fw-bold text-info mb-3 mt-2">Inventory Restocked</h5>
+                <p class="text-muted small">The new supply has been successfully added to the database.</p>
+                <button type="button" class="btn btn-sm btn-info text-white btn-action-modern mt-3" data-bs-dismiss="modal">Continue</button>
             </div>
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="saleSuccessModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content modal-content-modern border-success">
+            <div class="modal-header modal-header-modern bg-success text-white py-3">
+                <h6 class="modal-title fw-bold text-center w-100">Transaction Complete</h6>
+            </div>
+            <div class="modal-body modal-body-modern text-center py-4">
+                <h5 class="fw-bold text-success mb-3 mt-2">Sale Recorded</h5>
+                <p class="text-muted small">The sold quantity has been successfully deducted from the database.</p>
+                <button type="button" class="btn btn-sm btn-success text-white btn-action-modern mt-3" data-bs-dismiss="modal">Continue</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="zeroStockSystemAlertModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-content-modern border-danger">
+            <div class="modal-header modal-header-modern bg-danger text-white py-3">
+                <h6 class="modal-title fw-bold">System Stock Warning</h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body modal-body-modern text-center py-4">
+                <h4 class="text-danger fw-bold mb-3">Item(s) Out of Stock</h4>
+                <p class="text-muted mb-0">Attention: One or more products in your inventory are completely out of stock (0 available). The sales function for these items has been disabled until new supply is added.</p>
+            </div>
+            <div class="modal-footer modal-footer-modern d-flex justify-content-center">
+                <button type="button" class="btn btn-sm btn-danger fw-bold btn-action-modern" data-bs-dismiss="modal">Acknowledge</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="systemAlertModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-content-modern border-warning">
+            <div class="modal-header modal-header-modern bg-warning text-dark py-3">
+                <h6 class="modal-title fw-bold">System Stock Warning</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body modal-body-modern text-center py-4">
+                <h4 class="text-warning fw-bold mb-3" style="color: #f57c00 !important;">Critical Levels Detected</h4>
+                <p class="text-muted mb-0">One or more items in your inventory have reached critical levels (9 or below). Immediate review and restocking is advised to maintain stable operations.</p>
+            </div>
+            <div class="modal-footer modal-footer-modern d-flex justify-content-center">
+                <button type="button" class="btn btn-sm btn-warning fw-bold btn-action-modern" data-bs-dismiss="modal">Acknowledge</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="errorModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-content-modern border-danger">
+            <div class="modal-header modal-header-modern bg-danger text-white py-3">
+                <h6 class="modal-title fw-bold">Over-Limit Sale Attempt</h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body modal-body-modern text-center py-4">
+                <h4 class="fw-bold text-danger mb-3">Transaction Blocked</h4>
+                <p class="text-muted">You are attempting to sell <strong id="attemptedQtyDisplay" class="text-dark fs-5"></strong> items, but there are only <strong id="maxStockDisplay" class="text-danger fs-5"></strong> items currently available in the database.</p>
+                <p class="text-muted small mb-0">Please reduce the sales quantity to match the available stock before proceeding.</p>
+            </div>
+            <div class="modal-footer modal-footer-modern d-flex justify-content-center">
+                <button type="button" class="btn btn-sm btn-secondary btn-action-modern" data-bs-dismiss="modal">Review Entry</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="zeroStockModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content modal-content-modern border-secondary">
+            <div class="modal-header modal-header-modern bg-secondary text-white py-3">
+                <h6 class="modal-title fw-bold text-center w-100">Stock Depletion Notice</h6>
+            </div>
+            <div class="modal-body modal-body-modern text-center py-4">
+                <p class="text-muted small">You are about to sell the exact remaining quantity. Proceeding with this transaction will bring the item's inventory level to absolute zero. Please prepare for immediate reordering.</p>
+                <button type="button" class="btn btn-sm btn-info text-white btn-action-modern mt-3" data-bs-dismiss="modal">Proceed to Checkout</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    function updateHiddenTotal(addedSupply, currentStock, hiddenInputId) {
+        let sum = parseInt(currentStock);
+        if (addedSupply && addedSupply.trim() !== '') {
+            sum += parseInt(addedSupply);
+        }
+        document.getElementById(hiddenInputId).value = sum;
+    }
+
+    // Set Memory for Update (Restock)
+    function handleUpdateLogic() {
+        sessionStorage.setItem('lastAction', 'restock');
+        return true;
+    }
+
+    // Handle Sales and validations
+    function handleSalesLogic(event, formElement, currentStock) {
+        let requestedQty = formElement.querySelector('input[name="quantity"]').value;
+        let remainingQty = parseInt(currentStock) - parseInt(requestedQty);
+
+        if (remainingQty < 0) {
+            event.preventDefault();
+            document.getElementById('attemptedQtyDisplay').innerText = requestedQty;
+            document.getElementById('maxStockDisplay').innerText = currentStock;
+
+            let errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
+            errorModal.show();
+            return false;
+        }
+
+        if (remainingQty === 0) {
+            event.preventDefault();
+            let zeroStockModal = new bootstrap.Modal(document.getElementById('zeroStockModal'));
+            zeroStockModal.show();
+
+            document.getElementById('zeroStockModal').addEventListener('hidden.bs.modal', function () {
+                sessionStorage.setItem('lastAction', 'sale');
+                formElement.submit();
+            }, { once: true });
+
+            return false;
+        }
+
+        sessionStorage.setItem('lastAction', 'sale');
+        return true;
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        let lastAction = sessionStorage.getItem('lastAction');
+        sessionStorage.removeItem('lastAction'); // Clear memory agad
+
+        let outOfStockItems = document.querySelectorAll('.status-pills-container .status-out');
+        let lowStockItems = document.querySelectorAll('.status-pills-container .status-low');
+
+        if (lastAction === 'restock') {
+            let restockSuccess = new bootstrap.Modal(document.getElementById('restockSuccessModal'));
+            restockSuccess.show();
+        }
+        else if (lastAction === 'sale') {
+            if (outOfStockItems.length > 0) {
+                let zeroAlert = new bootstrap.Modal(document.getElementById('zeroStockSystemAlertModal'));
+                zeroAlert.show();
+            } else if (lowStockItems.length > 0) {
+                let systemAlert = new bootstrap.Modal(document.getElementById('systemAlertModal'));
+                systemAlert.show();
+            } else {
+                let saleSuccess = new bootstrap.Modal(document.getElementById('saleSuccessModal'));
+                saleSuccess.show();
+            }
+        }
+        else {
+            if (outOfStockItems.length > 0) {
+                let zeroAlert = new bootstrap.Modal(document.getElementById('zeroStockSystemAlertModal'));
+                zeroAlert.show();
+
+                document.getElementById('zeroStockSystemAlertModal').addEventListener('hidden.bs.modal', function () {
+                    if (lowStockItems.length > 0) {
+                        let systemAlert = new bootstrap.Modal(document.getElementById('systemAlertModal'));
+                        systemAlert.show();
+                    }
+                });
+            } else if (lowStockItems.length > 0) {
+                let systemAlert = new bootstrap.Modal(document.getElementById('systemAlertModal'));
+                systemAlert.show();
+            }
+        }
+    });
+</script>
 
 </body>
 </html>
